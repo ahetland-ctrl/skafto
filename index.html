@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hytta på Skaftö</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f5f4f0; display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
+  .phone-frame {
+    background: #ffffff;
+    border-radius: 36px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.13);
+    width: 390px;
+    min-height: 700px;
+    overflow: hidden;
+    position: relative;
+  }
+  .hg-root { font-family: 'DM Sans', sans-serif; font-size: 15px; color: #1a1a1a; }
+  .hg-header { padding: 2.5rem 1.5rem 1.5rem; text-align: center; border-bottom: 0.5px solid rgba(0,0,0,0.1); margin-bottom: 0.5rem; }
+  .hg-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #999; margin-bottom: 0.5rem; }
+  .hg-title { font-family: 'Lora', serif; font-size: 28px; font-weight: 400; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 0.35rem; }
+  .hg-subtitle { font-size: 13px; color: #666; font-weight: 300; }
+  .hg-nav { display: flex; border-bottom: 0.5px solid rgba(0,0,0,0.1); position: sticky; top: 0; background: #fff; z-index: 10; }
+  .hg-tab { flex: 1; padding: 0.9rem 0.5rem; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; text-align: center; cursor: pointer; color: #999; border-bottom: 2px solid transparent; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; user-select: none; font-family: 'DM Sans', sans-serif; }
+  .hg-tab.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }
+  .hg-icon { display: block; font-size: 16px; margin-bottom: 2px; }
+  .hg-section { display: none; padding: 1.25rem 1.5rem; }
+  .hg-section.active { display: block; }
+  .hg-group { margin-bottom: 1.75rem; }
+  .hg-group-title { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #999; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 0.5px solid rgba(0,0,0,0.1); }
+  .hg-item { display: flex; gap: 12px; padding: 0.7rem 0; border-bottom: 0.5px solid rgba(0,0,0,0.07); align-items: flex-start; }
+  .hg-item:last-child { border-bottom: none; }
+  .hg-dot { width: 6px; height: 6px; border-radius: 50%; background: #bbb; margin-top: 6px; flex-shrink: 0; }
+  .hg-dot.warn { background: #c4771a; }
+  .hg-dot.ok { background: #3b6d11; }
+  .hg-item-content { flex: 1; }
+  .hg-item-label { font-size: 14px; font-weight: 500; margin-bottom: 2px; line-height: 1.4; }
+  .hg-item-desc { font-size: 13px; color: #666; line-height: 1.5; font-weight: 300; }
+  .hg-card { background: #f5f4f0; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+  .hg-card-title { font-size: 13px; font-weight: 500; margin-bottom: 0.35rem; }
+  .hg-card-body { font-size: 13px; color: #666; line-height: 1.6; font-weight: 300; }
+  .hg-wifi { background: #f5f4f0; border-radius: 12px; padding: 1.25rem; display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; }
+  .hg-wifi-icon { font-size: 24px; line-height: 1; }
+  .hg-wifi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 2px; }
+  .hg-wifi-val { font-size: 15px; font-weight: 500; }
+  .hg-number { font-family: 'Lora', serif; font-size: 13px; font-style: italic; color: #666; display: inline; }
+  .hg-footer { padding: 1.5rem; border-top: 0.5px solid rgba(0,0,0,0.1); font-size: 12px; color: #bbb; text-align: center; margin-top: 1rem; }
+  .hg-checkbox-row { display: flex; gap: 10px; padding: 0.65rem 0; border-bottom: 0.5px solid rgba(0,0,0,0.07); align-items: center; cursor: pointer; }
+  .hg-checkbox-row:last-child { border-bottom: none; }
+  .hg-check { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid #ccc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
+  .hg-check.checked { background: #1a1a1a; border-color: #1a1a1a; }
+  .hg-check.checked::after { content: ''; width: 10px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translateY(-1px); display: block; }
+  .hg-checkbox-label { font-size: 14px; line-height: 1.4; flex: 1; transition: color 0.12s; }
+  .hg-checkbox-label.done { color: #bbb; text-decoration: line-through; text-decoration-color: #ccc; }
+  .hg-reset { margin-top: 1rem; font-size: 12px; color: #aaa; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; background: none; border: none; padding: 0; font-family: 'DM Sans', sans-serif; }
+</style>
+</head>
+<body>
+<div class="phone-frame">
+<div class="hg-root">
+  <div class="hg-header">
+    <div class="hg-eyebrow">Skaftö, Bohuslän</div>
+    <div class="hg-title">Hytta vår</div>
+    <div class="hg-subtitle">Alt du trenger å vite som gjest</div>
+  </div>
+
+  <div class="hg-nav">
+    <button class="hg-tab active" onclick="showTab('ankomst')"><span class="hg-icon">🏠</span>Ankomst</button>
+    <button class="hg-tab" onclick="showTab('under')"><span class="hg-icon">☀️</span>Under besøket</button>
+    <button class="hg-tab" onclick="showTab('avreise')"><span class="hg-icon">✓</span>Avreise</button>
+    <button class="hg-tab" onclick="showTab('info')"><span class="hg-icon">ℹ</span>Info</button>
+  </div>
+
+  <!-- ANKOMST -->
+  <div id="tab-ankomst" class="hg-section active">
+    <div class="hg-group">
+      <div class="hg-group-title">Nøkkel og adgang</div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Nøkkelboks</div>
+          <div class="hg-item-desc">Henger på høyre side av inngangsdøren. Kode: <strong>1234</strong>. Legg nøkkelen tilbake i boksen når du drar.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Garasje</div>
+          <div class="hg-item-desc">Fjernkontroll ligger i skuffen ved inngangsdøren. Ekstra fjernkontroll på knaggrekken.</div>
+        </div>
+      </div>
+    </div>
+    <div class="hg-group">
+      <div class="hg-group-title">Vann og strøm</div>
+      <div class="hg-item">
+        <div class="hg-dot warn"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Vann — skru på</div>
+          <div class="hg-item-desc">Vannkranen i kjelleren (bak trappa) må åpnes ved ankomst. Steng den igjen ved avreise.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Varmepumpe</div>
+          <div class="hg-item-desc">Fjernkontroll ligger på hylla i stua. Anbefalt temperatur: 20–22 °C. Skru ned til 16 °C ved avreise.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Strømbryteren</div>
+          <div class="hg-item-desc">Hovedsikringsskapet er i boden til venstre for kjøkkenet. Bryterne er merket.</div>
+        </div>
+      </div>
+    </div>
+    <div class="hg-group">
+      <div class="hg-group-title">Wi-Fi</div>
+      <div class="hg-wifi">
+        <div class="hg-wifi-icon">📶</div>
+        <div>
+          <div class="hg-wifi-label">Nettverk</div>
+          <div class="hg-wifi-val">HyttaNett_5G</div>
+        </div>
+      </div>
+      <div class="hg-wifi">
+        <div class="hg-wifi-icon">🔑</div>
+        <div>
+          <div class="hg-wifi-label">Passord</div>
+          <div class="hg-wifi-val">Breiflabb overalt!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNDER BESØKET -->
+  <div id="tab-under" class="hg-section">
+    <div class="hg-group">
+      <div class="hg-group-title">Søppel og kildesortering</div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Søppelcontainere</div>
+          <div class="hg-item-desc">Restavfall og matavfall i containerne nede ved veien. Papir og plast i egne poser — tas med og kastes i Lysekil sentrum.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Glass og metall</div>
+          <div class="hg-item-desc">Gjenvinningsstasjon ved Grundsund, ca. 5 min med bil.</div>
+        </div>
+      </div>
+    </div>
+    <div class="hg-group">
+      <div class="hg-group-title">Brygga og båten</div>
+      <div class="hg-item">
+        <div class="hg-dot warn"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Robåten</div>
+          <div class="hg-item-desc">Fri bruk, men fest den alltid med kjetting når du er ferdig. Årer henger inne i boden.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot warn"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Flytebrygga</div>
+          <div class="hg-item-desc">Kan være glatt ved regn. Barna må ha vest når de er nede ved brygga.</div>
+        </div>
+      </div>
+    </div>
+    <div class="hg-group">
+      <div class="hg-group-title">Praktisk i nærområdet</div>
+      <div class="hg-card">
+        <div class="hg-card-title">Dagligvarer</div>
+        <div class="hg-card-body">ICA Supermarket i Lysekil (15 min). Åpent 07–22 alle dager. Liten nærbutikk i Grundsund (10 min) — begrenset utvalg.</div>
+      </div>
+      <div class="hg-card">
+        <div class="hg-card-title">Drivstoff</div>
+        <div class="hg-card-body">Circle K i Lysekil, åpent døgnet rundt. Kortbetaling.</div>
+      </div>
+      <div class="hg-card">
+        <div class="hg-card-title">Legevakt</div>
+        <div class="hg-card-body">Lysekils vårdcentral, Kungsgatan 1. Ring 1177 for råd. Nødnummer: 112.</div>
+      </div>
+    </div>
+    <div class="hg-group">
+      <div class="hg-group-title">Tips og anbefalinger</div>
+      <div class="hg-item">
+        <div class="hg-dot ok"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Strandturer</div>
+          <div class="hg-item-desc">Gullholmen er verdt turen — ta ferja fra Hälleviksstrand (10 min). Kjente badefjell rett nedenfor hytta.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot ok"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Fiske</div>
+          <div class="hg-item-desc">Makrell og sei om sommeren. Stenger og agn i boden. Sjekk lokale regler på fiskeregler.se.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot ok"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Restaurant</div>
+          <div class="hg-item-desc">Brygghuset i Grundsund — god sjømat, book bord i helgene. Lysekilsfisken ved havna er beste stedet for fersk fisk.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AVREISE -->
+  <div id="tab-avreise" class="hg-section">
+    <div class="hg-group">
+      <div class="hg-group-title">Kjøkken og bad</div>
+      <div id="checklist-kitchen"></div>
+    </div>
+    <div class="hg-group">
+      <div class="hg-group-title">Vann, varme og strøm</div>
+      <div id="checklist-utilities"></div>
+    </div>
+    <div class="hg-group">
+      <div class="hg-group-title">Ute og låsing</div>
+      <div id="checklist-outside"></div>
+    </div>
+    <button class="hg-reset" onclick="resetChecklist()">Nullstill sjekkliste</button>
+  </div>
+
+  <!-- INFO -->
+  <div id="tab-info" class="hg-section">
+    <div class="hg-group">
+      <div class="hg-group-title">Kontakter</div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Eier — Steinar Hetland</div>
+          <div class="hg-item-desc"><span class="hg-number">+47 951 93 418</span> — ring gjerne ved spørsmål</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Nabo — Lars</div>
+          <div class="hg-item-desc"><span class="hg-number">+46 700 000 000</span> — kan hjelpe ved akutte problemer på stedet</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot warn"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Rørlegger — lokalt</div>
+          <div class="hg-item-desc">VVS Lysekil: <span class="hg-number">+46 523 000 000</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="hg-group">
+      <div class="hg-group-title">Adresse</div>
+      <div class="hg-card">
+        <div class="hg-card-body" style="font-size:14px; line-height: 2;">
+          Daniels väg 17<br>
+          451 78 Fiskebäckskil<br>
+          Sverige
+        </div>
+      </div>
+    </div>
+    <div class="hg-group">
+      <div class="hg-group-title">Husregler</div>
+      <div class="hg-item">
+        <div class="hg-dot warn"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Røyking</div>
+          <div class="hg-item-desc">Kun ute. Bruk askebegeret som ligger i skuffen i boden.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot warn"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Bål og grilling</div>
+          <div class="hg-item-desc">Bruk grillen på terrassen. Sjekk alltid bålforbud på yr.no eller 110.se ved tørke.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Støy</div>
+          <div class="hg-item-desc">Vi har gode naboer — vis hensyn, særlig etter kl. 23.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hg-footer">
+    Oppdatert mai 2025 · Hytta på Skaftö
+  </div>
+</div>
+</div>
+
+<script>
+const tabs = ['ankomst','under','avreise','info'];
+function showTab(name) {
+  tabs.forEach(t => { document.getElementById('tab-' + t).classList.toggle('active', t === name); });
+  document.querySelectorAll('.hg-tab').forEach((el, i) => { el.classList.toggle('active', tabs[i] === name); });
+}
+const checklistData = {
+  kitchen: ['Oppvaskmaskin tømt og ryddet','Kjøleskap tømt for matvarer','Søppel tømt og poser satt ut','Komfyr og ovn av og ren','Vinduer lukket på kjøkken'],
+  utilities: ['Vann stengt i kjelleren','Varmepumpe satt på 16 °C (fravær)','Alle lys slukket','Ladere og elektriske apparater av','Varmtvannsbereder: la stå på'],
+  outside: ['Robåten festet med kjetting','Hagemøbler satt inn eller dekket til','Boden låst','Nøkkel lagt tilbake i nøkkelboksen','Alle vinduer og dører låst']
+};
+const state = { kitchen: {}, utilities: {}, outside: {} };
+function buildChecklist(group, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  checklistData[group].forEach((label, i) => {
+    const row = document.createElement('div');
+    row.className = 'hg-checkbox-row';
+    const checked = state[group][i] || false;
+    row.innerHTML = `<div class="hg-check ${checked ? 'checked' : ''}"></div><div class="hg-checkbox-label ${checked ? 'done' : ''}">${label}</div>`;
+    row.onclick = () => { state[group][i] = !state[group][i]; buildChecklist(group, containerId); };
+    container.appendChild(row);
+  });
+}
+function resetChecklist() {
+  Object.keys(state).forEach(g => { state[g] = {}; });
+  buildChecklist('kitchen','checklist-kitchen');
+  buildChecklist('utilities','checklist-utilities');
+  buildChecklist('outside','checklist-outside');
+}
+buildChecklist('kitchen','checklist-kitchen');
+buildChecklist('utilities','checklist-utilities');
+buildChecklist('outside','checklist-outside');
+</script>
+</body>
+</html>
