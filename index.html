@@ -87,8 +87,8 @@
       <div class="hg-item">
         <div class="hg-dot"></div>
         <div class="hg-item-content">
-          <div class="hg-item-label">Sikring 46 — altan</div>
-          <div class="hg-item-desc">Vipp opp sikring 46 for å få lys på altanen (slå på når det blir mørkt).</div>
+          <div class="hg-item-label">Sikringer for utelys</div>
+          <div class="hg-item-desc">Vipp opp alle sikringene for utelys — unntatt <strong>loftsgang øst</strong>, som lyser inn på soveromssiden og forstyrrer om natten.</div>
         </div>
       </div>
       <div class="hg-item">
@@ -103,7 +103,7 @@
         <div class="hg-dot"></div>
         <div class="hg-item-content">
           <div class="hg-item-label">Varmepumpe</div>
-          <div class="hg-item-desc">Trykk <strong>Varme</strong>, deretter <strong>Endre</strong> — vri rattet slik at innstilling endres fra 1,7 til 2,2, lagre, tilbake.</div>
+          <div class="hg-item-desc">Trykk <strong>Varme</strong>, deretter <strong>Endre</strong> — vri rattet slik at innstilling endres fra 1,0 til 2,2, lagre, tilbake.</div>
         </div>
       </div>
       <div class="hg-item">
@@ -118,6 +118,20 @@
         <div class="hg-item-content">
           <div class="hg-item-label">Vannbåren gulvvarme</div>
           <div class="hg-item-desc">Ferdig innstilt, skal ikke endres. Hjulet til høyre.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Trykk i rørsystemet</div>
+          <div class="hg-item-desc">Sjekk at trykket viser ca. <strong>1 bar</strong>. Ved stort avvik: juster med den sorte dreieknappen merket <strong>«påfyll»</strong>.</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Gjestehus — varme</div>
+          <div class="hg-item-desc">Om noen skal bo i gjestehuset: øk varmeinnstilling på badet fra ca. 3 til 6–7. Vinterstid bør soverommet også ha litt varme.</div>
         </div>
       </div>
     </div>
@@ -180,6 +194,16 @@
         <div class="hg-item-content">
           <div class="hg-item-label">Om alarmen går</div>
           <div class="hg-item-desc">Trykk <strong>1234A</strong> på alarmkonsollet.</div>
+        </div>
+      </div>
+    </div>
+    <div class="hg-group">
+      <div class="hg-group-title">Ovn</div>
+      <div class="hg-item">
+        <div class="hg-dot warn"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Om ovnen gir feilmelding</div>
+          <div class="hg-item-desc">Vipp sikring 37 og 38 ned og opp igjen i sikringsskapet.</div>
         </div>
       </div>
     </div>
@@ -311,24 +335,27 @@ function showTab(name) {
 const checklistData = {
   kitchen: [
     'Gjort rent, fylt opp toalettpapir o.l. ved behov',
-    'Søppel tømt'
+    'Søppel tømt',
+    'Vinterstid: ta ut aske fra peis og ha den i askebøtta',
+    'Vinterstid: fyll opp vedkassen inne'
   ],
   utilities: [
     'Hovedkran for vann stengt',
-    'Elektrisk varmegulv skrudd ned til 3 (bad og gjestehus)',
+    'Elektrisk varmegulv: slå av i hovedhus — gjestehus skrus ned til ca. 3 (frostsikring)',
     'Sikringer 41–47: kun sikring 42 skal stå på'
   ],
   outside: [
-    'Dør mellom stue og soveromgang lukket — soveromsdører på gløtt',
+    'Dør mellom stue og soveromgang lukket — alle innvendige dører i øvre etasje på gløtt',
+    'Underetasje: dør til golfbag-rom lukket (holder det kjølig for øl og vin)',
     'Gardiner rullet ned i stue (gardin ved kamera bare halvveis)',
     'Kamera koblet til og sjekket på myDlink.com',
     'Baderomsdører lukket',
     'Skyvedører låst med nøkkel (hovedsoverom og stue)',
     'Puter lagt inn igjen om dere tok dem ut',
-    'Mellomhuk og boder låst',
+    'Boder låst (ikke mellomhukk — trøblete lås)',
     'Dører til hovedinngang, underetasje og gjestestue låst',
     'Begge porter på altan lukket (ved inngang)',
-    'Nøkkel lagt tilbake i nøkkelboksen'
+    'Reservenøkkel hengt tilbake på lurt sted'
   ]
 };
 const state = { kitchen: {}, utilities: {}, outside: {} };
