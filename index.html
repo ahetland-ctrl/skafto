@@ -135,6 +135,18 @@
   .hg-checkbox-label { font-size: 14px; line-height: 1.4; flex: 1; transition: color 0.12s; color: var(--text); }
   .hg-checkbox-label.done { color: #bbc8d4; text-decoration: line-through; text-decoration-color: #bbc8d4; }
   .hg-reset { margin-top: 1rem; font-size: 12px; color: var(--blue-mid); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; background: none; border: none; padding: 0; font-family: 'DM Sans', sans-serif; opacity: 0.7; }
+
+  /* Værvarselet + kjøretid */
+  .hg-weather-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--blue-dark); border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .hg-weather-bar-icon { width: 22px; height: 22px; flex-shrink: 0; }
+  .hg-weather-bar-temp { font-size: 14px; font-weight: 500; color: var(--white); }
+  .hg-weather-bar-desc { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .hg-weather-bar-wind { font-size: 12px; color: rgba(255,255,255,0.45); }
+  .hg-weather-bar-sep { width: 1px; height: 14px; background: rgba(255,255,255,0.2); margin: 0 0.25rem; flex-shrink: 0; }
+  .hg-weather-bar-travel { display: flex; align-items: center; gap: 0.3rem; margin-left: auto; flex-shrink: 0; }
+  .hg-weather-bar-travel-time { font-size: 13px; font-weight: 500; color: var(--white); }
+  .hg-weather-bar-travel-label { font-size: 11px; color: rgba(255,255,255,0.45); }
+  .hg-weather-bar-loading { font-size: 12px; color: rgba(255,255,255,0.4); padding: 0.5rem 1rem; background: var(--blue-dark); }
 </style>
 </head>
 <body>
@@ -155,6 +167,8 @@
     <div class="hg-title">Daniels väg 17</div>
     <div class="hg-subtitle">Alt du trenger å vite som gjest</div>
   </div>
+
+  <div id="weather-widget" class="hg-weather-bar-loading">Laster vær…</div>
 
   <div class="hg-nav">
     <button class="hg-tab active" onclick="showTab('ankomst')"><span class="hg-icon">🏠</span>Ankomst</button>
@@ -421,13 +435,17 @@
 </div>
 
 <script>
-if (sessionStorage.getItem('auth') === '1') document.getElementById('pw-screen').style.display = 'none';
+if (sessionStorage.getItem('auth') === '1') {
+  document.getElementById('pw-screen').style.display = 'none';
+  initWeather();
+}
 function checkPassword() {
   const val = document.getElementById('pw-input').value;
   const input = document.getElementById('pw-input');
   if (val === 'DV17') {
     sessionStorage.setItem('auth', '1');
     document.getElementById('pw-screen').style.display = 'none';
+    initWeather();
   } else {
     input.classList.add('error');
     document.getElementById('pw-error').textContent = 'Feil passord';
@@ -488,6 +506,88 @@ function resetChecklist() {
 buildChecklist('kitchen','checklist-kitchen');
 buildChecklist('utilities','checklist-utilities');
 buildChecklist('outside','checklist-outside');
+
+// --- Yr værvarselet ---
+async function initWeather() {
+  const widget = document.getElementById('weather-widget');
+  try {
+    let data;
+    const cached = localStorage.getItem('yr_data');
+    const exp = localStorage.getItem('yr_expires');
+    if (cached && exp && Date.now() < Number(exp)) {
+      data = JSON.parse(cached);
+    } else {
+      const res = await fetch('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=58.245&lon=11.465');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      data = await res.json();
+      const expHeader = res.headers.get('Expires');
+      localStorage.setItem('yr_data', JSON.stringify(data));
+      localStorage.setItem('yr_expires', String(expHeader ? new Date(expHeader).getTime() : Date.now() + 3600000));
+    }
+    const series = data.properties.timeseries;
+    const cur = series.find(s => new Date(s.time) >= new Date()) || series[0];
+    const temp = Math.round(cur.data.instant.details.air_temperature);
+    const wind = Math.round(cur.data.instant.details.wind_speed * 10) / 10;
+    const symbol = cur.data.next_1_hours?.summary?.symbol_code
+                || cur.data.next_6_hours?.summary?.symbol_code || 'cloudy';
+    const base = symbol.replace(/_day|_night|_polartwilight/g, '');
+    const label = ({clearsky:'Klarvær',fair:'Lettskyet',partlycloudy:'Delvis skyet',cloudy:'Overskyet',
+      fog:'Tåke',rainshowers:'Regnbyger',lightrainshowers:'Lette regnbyger',rain:'Regn',
+      lightrain:'Lett regn',heavyrain:'Kraftig regn',sleet:'Sludd',snow:'Snø',
+      snowshowers:'Snøbyger',thunder:'Torden'})[base] || base;
+    widget.className = 'hg-weather-bar';
+    widget.innerHTML = `
+      <img class="hg-weather-bar-icon" src="https://raw.githubusercontent.com/metno/weathericons/main/weather/svg/${symbol}.svg" alt="">
+      <span class="hg-weather-bar-temp">${temp}°</span>
+      <span class="hg-weather-bar-desc">${label}</span>
+      <span class="hg-weather-bar-wind">${wind} m/s</span>
+      <div class="hg-weather-bar-sep" id="travel-sep" style="display:none"></div>
+      <div class="hg-weather-bar-travel" id="travel-info" style="display:none">
+        <span class="hg-weather-bar-travel-label">🚗 Oslo</span>
+        <span class="hg-weather-bar-travel-time" id="travel-time"></span>
+      </div>`;
+  } catch(e) {
+    widget.className = 'hg-weather-bar';
+    widget.innerHTML = `
+      <div class="hg-weather-bar-sep" id="travel-sep" style="display:none"></div>
+      <div class="hg-weather-bar-travel" id="travel-info" style="display:none">
+        <span class="hg-weather-bar-travel-label">🚗 Oslo</span>
+        <span class="hg-weather-bar-travel-time" id="travel-time"></span>
+      </div>`;
+  }
+  initTravel();
+}
+
+async function initTravel() {
+  const el = document.getElementById('travel-time');
+  if (!el) return;
+  try {
+    const cached = localStorage.getItem('here_duration');
+    const exp = localStorage.getItem('here_expires');
+    let secs;
+    if (cached && exp && Date.now() < Number(exp)) {
+      secs = Number(cached);
+    } else {
+      const res = await fetch(
+        'https://router.hereapi.com/v8/routes?transportMode=car' +
+        '&origin=59.9108,10.7523&destination=58.245,11.465' +
+        '&return=summary' +
+        '&apikey=gdjPKvdXAMu5N-tMK-4Q5f4hhtJThHrJWOhPAdhkeUk'
+      );
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      secs = data.routes[0].sections[0].summary.duration;
+      localStorage.setItem('here_duration', String(secs));
+      localStorage.setItem('here_expires', String(Date.now() + 30 * 60 * 1000));
+    }
+    const h = Math.floor(secs / 3600);
+    const m = Math.round((secs % 3600) / 60);
+    el.textContent = `${h}t ${m}min`;
+    document.getElementById('travel-info').style.display = 'flex';
+    document.getElementById('travel-sep').style.display = 'block';
+  } catch(e) { /* skjul stille */ }
+}
+
 </script>
 </body>
 </html>
