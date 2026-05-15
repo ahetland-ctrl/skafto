@@ -7,65 +7,134 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --blue:       #2d5272;
+    --blue-dark:  #1e3d57;
+    --blue-mid:   #3a6690;
+    --blue-pale:  rgba(45,82,114,0.08);
+    --blue-faint: rgba(45,82,114,0.04);
+    --bg:         #f0eeea;
+    --white:      #ffffff;
+    --text:       #1a2a35;
+    --muted:      #6b808c;
+    --border:     rgba(45,82,114,0.12);
+    --warn:       #c4771a;
+    --ok:         #2d7a4a;
+  }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #f5f4f0; display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
-  .pw-screen { position: fixed; inset: 0; background: #f5f4f0; display: flex; align-items: center; justify-content: center; z-index: 100; }
-  .pw-box { background: #fff; border-radius: 24px; box-shadow: 0 8px 40px rgba(0,0,0,0.13); padding: 2.5rem 2rem; width: 320px; text-align: center; }
-  .pw-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #999; margin-bottom: 0.5rem; }
-  .pw-title { font-family: 'Lora', serif; font-size: 24px; font-weight: 400; color: #1a1a1a; margin-bottom: 1.75rem; }
+  body { background: var(--bg); display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
+
+  /* Password screen */
+  .pw-screen { position: fixed; inset: 0; background: var(--blue-dark); display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .pw-box { background: var(--white); border-radius: 24px; box-shadow: 0 12px 50px rgba(0,0,0,0.25); padding: 2.5rem 2rem; width: 320px; text-align: center; }
+  .pw-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+  .pw-title { font-family: 'Lora', serif; font-size: 24px; font-weight: 400; color: var(--blue); margin-bottom: 1.75rem; }
   .pw-input { width: 100%; border: 1.5px solid #ddd; border-radius: 10px; padding: 0.75rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 16px; text-align: center; letter-spacing: 0.1em; outline: none; transition: border 0.15s; }
-  .pw-input:focus { border-color: #1a1a1a; }
-  .pw-input.error { border-color: #c4771a; }
-  .pw-btn { margin-top: 0.75rem; width: 100%; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; padding: 0.75rem; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
-  .pw-btn:hover { opacity: 0.85; }
-  .pw-error { margin-top: 0.6rem; font-family: 'DM Sans', sans-serif; font-size: 12px; color: #c4771a; min-height: 1rem; }
+  .pw-input:focus { border-color: var(--blue); }
+  .pw-input.error { border-color: var(--warn); }
+  .pw-btn { margin-top: 0.75rem; width: 100%; background: var(--blue); color: var(--white); border: none; border-radius: 10px; padding: 0.75rem; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+  .pw-btn:hover { background: var(--blue-dark); }
+  .pw-error { margin-top: 0.6rem; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--warn); min-height: 1rem; }
+
+  /* Phone frame */
   .phone-frame {
-    background: #ffffff;
+    background: var(--white);
     border-radius: 36px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.13);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
     width: 390px;
     min-height: 700px;
     overflow: hidden;
     position: relative;
   }
-  .hg-root { font-family: 'DM Sans', sans-serif; font-size: 15px; color: #1a1a1a; }
-  .hg-header { padding: 2.5rem 1.5rem 1.5rem; text-align: center; border-bottom: 0.5px solid rgba(0,0,0,0.1); margin-bottom: 0.5rem; }
-  .hg-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #999; margin-bottom: 0.5rem; }
-  .hg-title { font-family: 'Lora', serif; font-size: 28px; font-weight: 400; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 0.35rem; }
-  .hg-subtitle { font-size: 13px; color: #666; font-weight: 300; }
-  .hg-nav { display: flex; border-bottom: 0.5px solid rgba(0,0,0,0.1); position: sticky; top: 0; background: #fff; z-index: 10; }
-  .hg-tab { flex: 1; padding: 0.9rem 0.5rem; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; text-align: center; cursor: pointer; color: #999; border-bottom: 2px solid transparent; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; user-select: none; font-family: 'DM Sans', sans-serif; }
-  .hg-tab.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }
+  .hg-root { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); }
+
+  /* Header — blå med porthole-dekor */
+  .hg-header {
+    padding: 2.75rem 1.5rem 2rem;
+    text-align: center;
+    background: var(--blue);
+    position: relative;
+    overflow: hidden;
+  }
+  /* Porthole-sirkler som dekorasjon */
+  .hg-header::before {
+    content: '';
+    position: absolute;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    border: 10px solid rgba(255,255,255,0.08);
+    top: -28px; right: -18px;
+  }
+  .hg-header::after {
+    content: '';
+    position: absolute;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: 7px solid rgba(255,255,255,0.06);
+    bottom: 12px; left: 18px;
+  }
+  .hg-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 0.5rem; }
+  .hg-title { font-family: 'Lora', serif; font-size: 28px; font-weight: 400; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 0.4rem; color: var(--white); }
+  .hg-porthole {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.3);
+    margin: 0.75rem auto 0.85rem;
+    position: relative;
+  }
+  .hg-porthole::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.15);
+  }
+  .hg-subtitle { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 300; }
+
+  /* Nav */
+  .hg-nav { display: flex; border-bottom: 0.5px solid var(--border); position: sticky; top: 0; background: var(--white); z-index: 10; }
+  .hg-tab { flex: 1; padding: 0.9rem 0.5rem; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; text-align: center; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; user-select: none; font-family: 'DM Sans', sans-serif; }
+  .hg-tab.active { color: var(--blue); border-bottom: 2px solid var(--blue); }
   .hg-icon { display: block; font-size: 16px; margin-bottom: 2px; }
-  .hg-section { display: none; padding: 1.25rem 1.5rem; }
+
+  /* Sections */
+  .hg-section { display: none; padding: 1.25rem 1.5rem; background: var(--white); }
   .hg-section.active { display: block; }
   .hg-group { margin-bottom: 1.75rem; }
-  .hg-group-title { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #999; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 0.5px solid rgba(0,0,0,0.1); }
-  .hg-item { display: flex; gap: 12px; padding: 0.7rem 0; border-bottom: 0.5px solid rgba(0,0,0,0.07); align-items: flex-start; }
+  .hg-group-title { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue-mid); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .hg-item { display: flex; gap: 12px; padding: 0.7rem 0; border-bottom: 0.5px solid rgba(45,82,114,0.07); align-items: flex-start; }
   .hg-item:last-child { border-bottom: none; }
-  .hg-dot { width: 6px; height: 6px; border-radius: 50%; background: #bbb; margin-top: 6px; flex-shrink: 0; }
-  .hg-dot.warn { background: #c4771a; }
-  .hg-dot.ok { background: #3b6d11; }
+  .hg-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue-mid); opacity: 0.5; margin-top: 6px; flex-shrink: 0; }
+  .hg-dot.warn { background: var(--blue-mid); opacity: 0.5; }
+  .hg-dot.ok { background: var(--blue-mid); opacity: 0.5; }
   .hg-item-content { flex: 1; }
-  .hg-item-label { font-size: 14px; font-weight: 500; margin-bottom: 2px; line-height: 1.4; }
-  .hg-item-desc { font-size: 13px; color: #666; line-height: 1.5; font-weight: 300; }
-  .hg-card { background: #f5f4f0; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
-  .hg-card-title { font-size: 13px; font-weight: 500; margin-bottom: 0.35rem; }
-  .hg-card-body { font-size: 13px; color: #666; line-height: 1.6; font-weight: 300; }
-  .hg-wifi { background: #f5f4f0; border-radius: 12px; padding: 1.25rem; display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; }
+  .hg-item-label { font-size: 14px; font-weight: 500; margin-bottom: 2px; line-height: 1.4; color: var(--text); }
+  .hg-item-desc { font-size: 13px; color: var(--muted); line-height: 1.5; font-weight: 300; }
+
+  /* Cards */
+  .hg-card { background: var(--blue-faint); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+  .hg-card-title { font-size: 13px; font-weight: 500; margin-bottom: 0.35rem; color: var(--text); }
+  .hg-card-body { font-size: 13px; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+  /* Wifi */
+  .hg-wifi { background: var(--blue-pale); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; }
   .hg-wifi-icon { font-size: 24px; line-height: 1; }
-  .hg-wifi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 2px; }
-  .hg-wifi-val { font-size: 15px; font-weight: 500; }
-  .hg-number { font-family: 'Lora', serif; font-size: 13px; font-style: italic; color: #666; display: inline; }
-  .hg-footer { padding: 1.5rem; border-top: 0.5px solid rgba(0,0,0,0.1); font-size: 12px; color: #bbb; text-align: center; margin-top: 1rem; }
-  .hg-checkbox-row { display: flex; gap: 10px; padding: 0.65rem 0; border-bottom: 0.5px solid rgba(0,0,0,0.07); align-items: center; cursor: pointer; }
+  .hg-wifi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 2px; }
+  .hg-wifi-val { font-size: 15px; font-weight: 500; color: var(--blue); }
+  .hg-number { font-family: 'Lora', serif; font-size: 13px; font-style: italic; color: var(--muted); display: inline; }
+
+  /* Footer */
+  .hg-footer { padding: 1.5rem; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); text-align: center; margin-top: 1rem; opacity: 0.7; }
+
+  /* Checklist */
+  .hg-checkbox-row { display: flex; gap: 10px; padding: 0.65rem 0; border-bottom: 0.5px solid rgba(45,82,114,0.07); align-items: center; cursor: pointer; }
   .hg-checkbox-row:last-child { border-bottom: none; }
-  .hg-check { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid #ccc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
-  .hg-check.checked { background: #1a1a1a; border-color: #1a1a1a; }
+  .hg-check { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid #bbc8d4; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
+  .hg-check.checked { background: var(--blue); border-color: var(--blue); }
   .hg-check.checked::after { content: ''; width: 10px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translateY(-1px); display: block; }
-  .hg-checkbox-label { font-size: 14px; line-height: 1.4; flex: 1; transition: color 0.12s; }
-  .hg-checkbox-label.done { color: #bbb; text-decoration: line-through; text-decoration-color: #ccc; }
-  .hg-reset { margin-top: 1rem; font-size: 12px; color: #aaa; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; background: none; border: none; padding: 0; font-family: 'DM Sans', sans-serif; }
+  .hg-checkbox-label { font-size: 14px; line-height: 1.4; flex: 1; transition: color 0.12s; color: var(--text); }
+  .hg-checkbox-label.done { color: #bbc8d4; text-decoration: line-through; text-decoration-color: #bbc8d4; }
+  .hg-reset { margin-top: 1rem; font-size: 12px; color: var(--blue-mid); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; background: none; border: none; padding: 0; font-family: 'DM Sans', sans-serif; opacity: 0.7; }
 </style>
 </head>
 <body>
@@ -82,6 +151,7 @@
 <div class="hg-root">
   <div class="hg-header">
     <div class="hg-eyebrow">Skaftö, Bohuslän</div>
+    <div class="hg-porthole" aria-hidden="true"></div>
     <div class="hg-title">Daniels väg 17</div>
     <div class="hg-subtitle">Alt du trenger å vite som gjest</div>
   </div>
