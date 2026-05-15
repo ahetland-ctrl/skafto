@@ -9,6 +9,16 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #f5f4f0; display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
+  .pw-screen { position: fixed; inset: 0; background: #f5f4f0; display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .pw-box { background: #fff; border-radius: 24px; box-shadow: 0 8px 40px rgba(0,0,0,0.13); padding: 2.5rem 2rem; width: 320px; text-align: center; }
+  .pw-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #999; margin-bottom: 0.5rem; }
+  .pw-title { font-family: 'Lora', serif; font-size: 24px; font-weight: 400; color: #1a1a1a; margin-bottom: 1.75rem; }
+  .pw-input { width: 100%; border: 1.5px solid #ddd; border-radius: 10px; padding: 0.75rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 16px; text-align: center; letter-spacing: 0.1em; outline: none; transition: border 0.15s; }
+  .pw-input:focus { border-color: #1a1a1a; }
+  .pw-input.error { border-color: #c4771a; }
+  .pw-btn { margin-top: 0.75rem; width: 100%; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; padding: 0.75rem; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
+  .pw-btn:hover { opacity: 0.85; }
+  .pw-error { margin-top: 0.6rem; font-family: 'DM Sans', sans-serif; font-size: 12px; color: #c4771a; min-height: 1rem; }
   .phone-frame {
     background: #ffffff;
     border-radius: 36px;
@@ -59,6 +69,15 @@
 </style>
 </head>
 <body>
+<div class="pw-screen" id="pw-screen">
+  <div class="pw-box">
+    <div class="pw-eyebrow">Skaftö, Bohuslän</div>
+    <div class="pw-title">Daniels väg 17</div>
+    <input class="pw-input" id="pw-input" type="password" placeholder="Passord" autocomplete="off">
+    <button class="pw-btn" onclick="checkPassword()">Logg inn</button>
+    <div class="pw-error" id="pw-error"></div>
+  </div>
+</div>
 <div class="phone-frame">
 <div class="hg-root">
   <div class="hg-header">
@@ -139,20 +158,6 @@
           <div class="hg-item-label">Varme</div>
           <div class="hg-item-desc">Om noen skal bo i gjestehuset: øk varmeinnstilling på badet fra ca. 3 til 6–7. Vinterstid bør soverommet også ha litt varme.</div>
         </div>
-      </div>
-    </div>
-    <div class="hg-wifi">
-      <div class="hg-wifi-icon">📶</div>
-      <div>
-        <div class="hg-wifi-label">Nettverk</div>
-        <div class="hg-wifi-val">HyttaNett_5G</div>
-      </div>
-    </div>
-    <div class="hg-wifi">
-      <div class="hg-wifi-icon">🔑</div>
-      <div>
-        <div class="hg-wifi-label">Passord</div>
-        <div class="hg-wifi-val">Breiflabb overalt!</div>
       </div>
     </div>
   </div>
@@ -280,7 +285,6 @@
   <!-- INFO -->
   <div id="tab-info" class="hg-section">
     <div class="hg-group">
-      <div class="hg-group-title">Nødnumre</div>
       <div class="hg-item">
         <div class="hg-dot warn"></div>
         <div class="hg-item-content">
@@ -309,16 +313,6 @@
           <div class="hg-item-desc"><span class="hg-number">0523-23220</span></div>
         </div>
       </div>
-    </div>
-    <div class="hg-group">
-      <div class="hg-group-title">Eier</div>
-      <div class="hg-item">
-        <div class="hg-dot"></div>
-        <div class="hg-item-content">
-          <div class="hg-item-label">Steinar Hetland</div>
-          <div class="hg-item-desc"><span class="hg-number">+47 951 93 418</span> — ring gjerne ved spørsmål</div>
-        </div>
-      </div>
       <div class="hg-item">
         <div class="hg-dot"></div>
         <div class="hg-item-content">
@@ -333,14 +327,18 @@
           <div class="hg-item-desc"><strong>1234A</strong></div>
         </div>
       </div>
-    </div>
-    <div class="hg-group">
-      <div class="hg-group-title">Adresse</div>
-      <div class="hg-card">
-        <div class="hg-card-body" style="font-size:14px; line-height: 2;">
-          Daniels väg 17<br>
-          451 78 Fiskebäckskil<br>
-          Sverige
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Wifi</div>
+          <div class="hg-item-desc">Nettverk: DV17 · Passord: Breiflabb overalt!</div>
+        </div>
+      </div>
+      <div class="hg-item">
+        <div class="hg-dot"></div>
+        <div class="hg-item-content">
+          <div class="hg-item-label">Adresse</div>
+          <div class="hg-item-desc">Daniels väg 17, 451 78 Fiskebäckskil, Sverige</div>
         </div>
       </div>
     </div>
@@ -353,6 +351,20 @@
 </div>
 
 <script>
+if (sessionStorage.getItem('auth') === '1') document.getElementById('pw-screen').style.display = 'none';
+function checkPassword() {
+  const val = document.getElementById('pw-input').value;
+  const input = document.getElementById('pw-input');
+  if (val === 'DV17') {
+    sessionStorage.setItem('auth', '1');
+    document.getElementById('pw-screen').style.display = 'none';
+  } else {
+    input.classList.add('error');
+    document.getElementById('pw-error').textContent = 'Feil passord';
+    setTimeout(() => input.classList.remove('error'), 1000);
+  }
+}
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
 const tabs = ['ankomst','under','avreise','info'];
 function showTab(name) {
   tabs.forEach(t => { document.getElementById('tab-' + t).classList.toggle('active', t === name); });
